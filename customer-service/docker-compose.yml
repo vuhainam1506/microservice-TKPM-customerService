@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  customer-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MONGO_URI=mongodb://customer-db:27017/customer_db
+    depends_on:
+      - customer-db
+    networks:
+      - customer-network
+
+  customer-db:
+    image: mongo:latest
+    ports:
+      - "27019:27017"
+    environment:
+      - MONGODB_DATABASE=customer_db
+    volumes:
+      - customer-data:/data/db
+      - ./init-db:/docker-entrypoint-initdb.d
+    networks:
+      - customer-network
+
+volumes:
+  customer-data:
+
+networks:
+  customer-network:
+    driver: bridge
